@@ -9,8 +9,17 @@ function setup()
 
     nodes = new Array();
 
-    nodes.push(new MixNode(width/3,height/2));
-    nodes.push(new Output(width/2,height/2));
+    nodes.push(new ColorNode(10,height/2));
+    nodes.push(new ColorNode(10,height/2+100));
+    nodes.push(new MixNode(210,height/2));
+    nodes.push(new OutNode(410,height/2));
+
+    nodes[2].connect('iColor1',nodes[0],'oColor');
+    nodes[2].connect('iColor2',nodes[1],'oColor');
+    nodes[3].connect('iImage',nodes[2],'oColor');
+
+    nodes[0].setColor(color(0,255,0));
+    nodes[1].setColor(color(255,0,0));
 
     backColor = 100;
 }
@@ -19,9 +28,10 @@ function draw()
 {
     background(backColor);
 
+    nodes[3].compute();
+
     nodes.forEach(function(node)
     {
-        node.update();
         node.draw();
     }, this);
 }

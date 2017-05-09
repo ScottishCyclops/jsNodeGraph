@@ -1,15 +1,17 @@
 HEADER_MIN_WIDTH = 90;
 HEADER_HEIGHT = 30;
 BOX_COLOR = '#333';
-TEXT_COLOR = 255;
+TEXT_LIGHT_COLOR = '#ecf0f1';
+TEXT_DARK_COLOR = '#2c3e50';
 SELECT_COLOR = '#d35400';
 RESIZE_COLOR = '#e67e22';
 SELECT_DIST = 5;
 HEADING_PADDING = 12;
+DARK_TEXT_THRESHOLD = 80;
 
 class BaseNode
 {
-    constructor(x,y,w,h,color,heading)
+    constructor(x,y,w,h,c,heading)
     {
         //style to check final size
         textFont('Courier New');
@@ -21,7 +23,7 @@ class BaseNode
         this.y = y;
         this.w = this.minWidth;
         this.h = max(h,HEADER_HEIGHT);
-        this.color = color;
+        this.color = c;
         this.heading = heading;
 
         this.isMinimized = false;
@@ -29,7 +31,9 @@ class BaseNode
         this.isResizeZoneHovered = false;
 
         this.ios = null;
-        this.needsRecompute = false;
+        this.needsRecompute = true;
+
+        this.textColor = brightness(color(this.color)) > DARK_TEXT_THRESHOLD ? TEXT_DARK_COLOR : TEXT_LIGHT_COLOR;
     }
 
     compute()
@@ -41,21 +45,32 @@ class BaseNode
             if(this.ios[io].connection != null)
             {
                 //we make sure the node's output are up to date
-                this.ios[io].connection.node.compute();
-                //we take the value from the node's ouput we are connected to
-                this.ios[io].value = this.ios[io].connection.node.ios[this.ios[io].connection.outputName].value;
+                if(this.ios[io].connection.node.needsRecompute)
+                {
+                    this.ios[io].connection.node.compute();
+                    //we take the value from the node's ouput we are connected to
+                    this.ios[io].value = this.ios[io].connection.node.ios[this.ios[io].connection.outputName].value;
+
+                    //if the parent needs recompute, so do we
+                    this.needsRecompute = true;
+                }
             }
         }
+        console.log("computed " + this.heading);
     }
     
     connect(inputName,outputNode,outputName)
     {
+        this.ios[inputName].defaultValue = this.ios[inputName].value;
         this.ios[inputName].connection = new Connection(outputNode,outputName);
+        this.needsRecompute = true;
     }
 
     disconnect(inputName)
     {
+        this.ios[inputName].value = this.ios[inputName].defaultValue;
         this.ios[inputName].connection = null;
+        this.needsRecompute = true;
     }
 
     moveTo(x,y)
@@ -78,7 +93,9 @@ class BaseNode
         //heading
         textStyle(BOLD);
         textSize(13);
-        fill(TEXT_COLOR);
+
+        fill(this.textColor);
+
         textAlign(CENTER,CENTER);
         text(this.heading,this.x+this.w/2,this.y+HEADER_HEIGHT/2);
 
@@ -106,16 +123,30 @@ class BaseNode
         //at the end because on top of everything
         if(!this.isMinimized)
         {
-            //drawing inputs
+            //drawing ios
             for(let i in this.ios)
             {
                 let xPos = this.x
+                let yPos = this.y+HEADER_HEIGHT+IO_PADDING;
                 if(this.ios[i].ioType === ioTypes.OUT)
                 {
                     xPos+=this.w;
                 }
-                    
-                this.ios[i].draw(xPos,this.y+HEADER_HEIGHT+IO_PADDING);
+
+                //we draw the line below the point
+                if(this.ios[i].connection != null)
+                {
+                    noFill();
+                    stroke(0);
+                    strokeWeight(2);
+
+                    let connectX = this.ios[i].connection.node.x + this.ios[i].connection.node.w;
+                    let connectY = this.ios[i].connection.node.y+HEADER_HEIGHT+IO_PADDING + this.ios[i].connection.node.ios[this.ios[i].connection.outputName].y;
+
+                    line(xPos,yPos+this.ios[i].y,connectX,connectY);
+                }
+
+                this.ios[i].draw(xPos,yPos);
             }
         }
     }

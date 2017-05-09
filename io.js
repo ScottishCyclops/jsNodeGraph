@@ -36,7 +36,7 @@ class Io
 {
     constructor(index,ioType,dataType,legend,connection,defaultValue)
     {
-        this.index = index;
+        this.y = index*IO_DISTANCE;
         this.ioType = ioType;
         this.dataType = dataType;
         this.legend = legend;
@@ -50,26 +50,35 @@ class Io
         //circle
         fill(dataTypes.properties[this.dataType].color);
         noStroke();
-        ellipse(x,y+this.index*IO_DISTANCE,IO_RADIUS);
+        ellipse(x,this.y+y,IO_RADIUS);
 
         //legend and value
-         //no connection, direct legend
-        if(!this.isConnected)
+         //no connection, input field then legend
+
+        let inputFieldPadding = 10;
+        if(this.connection != null || this.ioType === ioTypes.OUT)
         {
-            fill(IO_LEGEND_COLOR);
-            textStyle(NORMAL);
-            textSize(12);
-            textAlign(LEFT,CENTER);
-            
-            let legendX = x+IO_LEGEND_PADDING;
-
-            if(this.ioType === ioTypes.OUT)
-            {
-                textAlign(RIGHT,CENTER);
-                legendX = x-IO_LEGEND_PADDING;
-            }
-
-            text(this.legend,legendX,y+this.index*IO_DISTANCE);
+            inputFieldPadding = 0;
         }
+
+        if(this.connection === null)
+        {
+            //draw input box
+        }
+
+        fill(IO_LEGEND_COLOR);
+        textStyle(NORMAL);
+        textSize(12);
+
+        textAlign(LEFT,CENTER);
+        let legendX = x+IO_LEGEND_PADDING+inputFieldPadding;
+
+        if(this.ioType === ioTypes.OUT)
+        {
+            textAlign(RIGHT,CENTER);
+            legendX = x-IO_LEGEND_PADDING-inputFieldPadding;
+        }
+
+        text(this.legend,legendX,this.y+y);
     }
 }

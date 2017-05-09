@@ -3,28 +3,31 @@ class MixNode extends BaseNode
     constructor(x,y)
     {
         super(x,y,130,120,'#16a085','Mix');
-
         this.ios =
         {
-            'iMix' : new Io('in','mix',null,0.5),
-            'iColor1' : new Io('out','color1',null,color(  0,  0,  0)),
-            'iColor2' : new Io('out','color2',null,color(255,255,255)),
-            'oColor' : new Io('out','color',null,color(0,0,0)),
+            'iMix'    : new Io(0, ioTypes.IN,  dataTypes.NUMBER, 'Mix',    null, 0.5),
+            'iColor1' : new Io(1, ioTypes.IN,  dataTypes.COLOR,  'Color1', null, color(  0,  0,  0)),
+            'iColor2' : new Io(2, ioTypes.IN,  dataTypes.COLOR,  'Color2', null, color(255,255,255)),
+            'oColor'  : new Io(0, ioTypes.OUT, dataTypes.COLOR,  'Color',  null, color(  0,  0,  0)),
         };
 
     }
 
     compute()
     {
-        let fac = this.ios['factor'].value;
-        let color1 = this.ios['color1'].value;
-        let color2 = this.ios['color2'].value;
+        //we update our input values
+        super.compute();
 
-        this.ios['color'].value = lerpColor(color1,color2,fac);
+        if(this.needsRecompute)
+        {
+            //actual node work
+            this.ios['oColor'].value = lerpColor(this.ios['iColor1'].value,this.ios['iColor2'].value,this.ios['iMix'].value);
+            this.needsRecompute = false;
+        }
     }
 }
-/*
-class Output extends BaseNode
+
+class OutNode extends BaseNode
 {
     constructor(x,y)
     {
@@ -32,43 +35,38 @@ class Output extends BaseNode
 
         this.ios =
         {
-            'image' : new Io(0, ioTypes.IN,dataTypes.COLOR,'Image',0),
+            'iImage' : new Io(0, ioTypes.IN, dataTypes.COLOR, 'Image', null, color(0,0,0)),
         };
     }
 
     compute()
     {
-        let image = this.ios['image'].value;
-        setBackgroundColor(image);
+        super.compute();
+        setBackgroundColor(this.ios['iImage'].value);
     }
 }
-*/
 
-class MixNode extends BaseNode
+class ColorNode extends BaseNode
 {
-    constructor()
+    constructor(x,y)
     {
-        super();
+        super(x,y,130,60,'#f1c40f','RGB Color');
+
         this.ios =
         {
-            'iMix' : new Io('in','mix',null,0.5),
-            'iColor1' : new Io('out','color1',null,color(  0,  0,  0)),
-            'iColor2' : new Io('out','color2',null,color(255,255,255)),
-            'oColor' : new Io('out','color',null,color(0,0,0)),
+            'oColor' : new Io(0, ioTypes.OUT, dataTypes.COLOR, 'Color', null, color(255,0,0)),
         };
     }
 
     compute()
     {
-        if(this.needsRecompute)
-        {
-            //we update our input values
-            super.compute();
+        super.compute();
+        this.needsRecompute = false;
+    }
 
-            //actual node work
-            this.ios['oColor'].value = lerpColor(this.ios['iColor1'].value,this.ios['iColor2'].value,this.ios['iMix'].value);
-
-            this.needsRecompute = false;
-        }
+    setColor(c)
+    {
+        this.ios['oColor'].value = c;
+        this.needsRecompute = true;
     }
 }
