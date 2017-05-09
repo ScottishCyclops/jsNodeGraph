@@ -23,28 +23,26 @@ let ioTypes = Object.freeze
     OUT: 1,
 });
 
+class Connection
+{
+    constructor(node,outputName)
+    {
+        this.node = node;
+        this.outputName = outputName;
+    }
+}
+
 class Io
 {
-    constructor(index,ioType,dataType,legend,defaultValue)
+    constructor(index,ioType,dataType,legend,connection,defaultValue)
     {
         this.index = index;
         this.ioType = ioType;
         this.dataType = dataType;
-        this.connection = null;
         this.legend = legend;
+        this.connection = connection;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
-    }
-
-    connect(io)
-    {
-        this.connection = io;
-    }
-
-    disconnect()
-    {
-        this.connection = null;
-        this.value = this.defaultValue;
     }
 
     draw(x,y)

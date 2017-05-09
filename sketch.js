@@ -79,3 +79,24 @@ function setBackgroundColor(newColor)
 {
     backColor = newColor;
 }
+
+function isCursorInNode(shape)
+{
+    return (mouseX >= shape.x && mouseX <= shape.x+shape.w) && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
+}
+
+function isCursorWithinResizeZone(shape)
+{
+    return abs(mouseX-(shape.x+shape.w)) <= SELECT_DIST && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
+}
+
+/**
+ * Returns a number between a minimum and a maximum
+ * @param {Number} n 
+ * @param {Number} minimum 
+ * @param {Number} maximum 
+ */
+function clamp(n,minimum,maximum)
+{
+    return min(max(n,minimum),maximum);
+}

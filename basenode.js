@@ -23,23 +23,39 @@ class BaseNode
         this.h = max(h,HEADER_HEIGHT);
         this.color = color;
         this.heading = heading;
+
         this.isMinimized = false;
         this.isSelected = false;
-
         this.isResizeZoneHovered = false;
 
         this.ios = null;
-        this.connections = null;
-
         this.needsRecompute = false;
     }
 
-    update()
+    compute()
     {
-        if(this.needsRecompute)
+        //foreach io in this node, we update it's value
+        for(let io in this.ios)
         {
-            this.compute();
+            //if the io is connected to something. otherwise, the value is up to date
+            if(this.ios[io].connection != null)
+            {
+                //we make sure the node's output are up to date
+                this.ios[io].connection.node.compute();
+                //we take the value from the node's ouput we are connected to
+                this.ios[io].value = this.ios[io].connection.node.ios[this.ios[io].connection.outputName].value;
+            }
         }
+    }
+    
+    connect(inputName,outputNode,outputName)
+    {
+        this.ios[inputName].connection = new Connection(outputNode,outputName);
+    }
+
+    disconnect(inputName)
+    {
+        this.ios[inputName].connection = null;
     }
 
     moveTo(x,y)
@@ -123,25 +139,4 @@ class BaseNode
     {
         this.isSelected = false;
     }
-}
-
-function isCursorInNode(shape)
-{
-    return (mouseX >= shape.x && mouseX <= shape.x+shape.w) && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
-}
-
-function isCursorWithinResizeZone(shape)
-{
-    return abs(mouseX-(shape.x+shape.w)) <= SELECT_DIST && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
-}
-
-/**
- * Returns a number between a minimum and a maximum
- * @param {Number} n 
- * @param {Number} minimum 
- * @param {Number} maximum 
- */
-function clamp(n,minimum,maximum)
-{
-    return min(max(n,minimum),maximum);
 }

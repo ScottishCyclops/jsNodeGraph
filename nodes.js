@@ -6,10 +6,10 @@ class MixNode extends BaseNode
 
         this.ios =
         {
-            'factor' : new Io(0, ioTypes.IN,dataTypes.NUMBER,'Fac',0.5),
-            'color1' : new Io(1, ioTypes.IN,dataTypes.COLOR,'Color 1',color(255,0,0)),
-            'color2' : new Io(2, ioTypes.IN,dataTypes.COLOR,'Color 2',color(100,100,100)),
-            'color'  : new Io(0, ioTypes.OUT,dataTypes.COLOR,'Color',0),
+            'iMix' : new Io('in','mix',null,0.5),
+            'iColor1' : new Io('out','color1',null,color(  0,  0,  0)),
+            'iColor2' : new Io('out','color2',null,color(255,255,255)),
+            'oColor' : new Io('out','color',null,color(0,0,0)),
         };
 
     }
@@ -23,7 +23,7 @@ class MixNode extends BaseNode
         this.ios['color'].value = lerpColor(color1,color2,fac);
     }
 }
-
+/*
 class Output extends BaseNode
 {
     constructor(x,y)
@@ -40,5 +40,35 @@ class Output extends BaseNode
     {
         let image = this.ios['image'].value;
         setBackgroundColor(image);
+    }
+}
+*/
+
+class MixNode extends BaseNode
+{
+    constructor()
+    {
+        super();
+        this.ios =
+        {
+            'iMix' : new Io('in','mix',null,0.5),
+            'iColor1' : new Io('out','color1',null,color(  0,  0,  0)),
+            'iColor2' : new Io('out','color2',null,color(255,255,255)),
+            'oColor' : new Io('out','color',null,color(0,0,0)),
+        };
+    }
+
+    compute()
+    {
+        if(this.needsRecompute)
+        {
+            //we update our input values
+            super.compute();
+
+            //actual node work
+            this.ios['oColor'].value = lerpColor(this.ios['iColor1'].value,this.ios['iColor2'].value,this.ios['iMix'].value);
+
+            this.needsRecompute = false;
+        }
     }
 }
