@@ -1,6 +1,8 @@
+//variable containing the difference between the selected node's position and the cursor position
 let moveOffset;
+//array containing all the nodes of the graph
 let nodes;
-
+//test variable containing the current background color
 let backColor;
 
 function setup()
@@ -9,17 +11,17 @@ function setup()
 
     nodes = new Array();
 
+    nodes.push(new OutNode(410,height/2));
     nodes.push(new ColorNode(10,height/2));
     nodes.push(new ColorNode(10,height/2+100));
     nodes.push(new MixNode(210,height/2));
-    nodes.push(new OutNode(410,height/2));
 
-    nodes[2].connect('iColor1',nodes[0],'oColor');
-    nodes[2].connect('iColor2',nodes[1],'oColor');
-    nodes[3].connect('iImage',nodes[2],'oColor');
+    nodes[3].connect('iColor1',nodes[1],'oColor');
+    nodes[3].connect('iColor2',nodes[2],'oColor');
+    nodes[0].connect('iImage',nodes[3],'oColor');
 
-    nodes[0].setColor(color(0,255,0));
-    nodes[1].setColor(color(255,0,0));
+    nodes[1].setColor(color(0,255,0));
+    nodes[2].setColor(color(255,0,0));
 
     backColor = 100;
 }
@@ -28,10 +30,10 @@ function draw()
 {
     background(backColor);
 
-    nodes[3].compute();
+    //we always compute the output node
+    nodes[0].compute();
 
-    nodes.forEach(function(node)
-    {
+    nodes.forEach(function(node){
         node.draw();
     }, this);
 }
@@ -40,7 +42,7 @@ function mousePressed()
 {
     if(mouseButton === LEFT)
     {
-        nodes.forEach(function(node) {
+        nodes.forEach(function(node){
             if(isCursorInNode(node) || node.isResizeZoneHovered)
             {
                 node.select();
@@ -85,26 +87,42 @@ function mouseDragged()
     }
 }
 
+/**
+ * changes the background color variable.
+ * 
+ * @param {*} newColor 
+ */
 function setBackgroundColor(newColor)
 {
     backColor = newColor;
 }
 
-function isCursorInNode(shape)
+/**
+ * Returns whether the cursor is currently inside a given node.
+ * 
+ * @param {BaseNode} node the node to test
+ */
+function isCursorInNode(node)
 {
-    return (mouseX >= shape.x && mouseX <= shape.x+shape.w) && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
-}
-
-function isCursorWithinResizeZone(shape)
-{
-    return abs(mouseX-(shape.x+shape.w)) <= SELECT_DIST && (mouseY >= shape.y && mouseY <= shape.y+shape.h);
+    return (mouseX >= node.x && mouseX <= node.x+node.w) && (mouseY >= node.y && mouseY <= node.y+node.h);
 }
 
 /**
- * Returns a number between a minimum and a maximum
- * @param {Number} n 
- * @param {Number} minimum 
- * @param {Number} maximum 
+ * Returns whether the cursor is currently inside the resizing zone of a given node.
+ * 
+ * @param {BaseNode} node the node to test
+ */
+function isCursorWithinResizeZone(node)
+{
+    return abs(mouseX-(node.x+node.w)) <= SELECT_DIST && (mouseY >= node.y && mouseY <= node.y+node.h);
+}
+
+/**
+ * Returns n constrained between the minimum and the maximum.
+ * 
+ * @param {number} n the number to clamp
+ * @param {number} minimum the minimum value to return
+ * @param {number} maximum the maximum value to return
  */
 function clamp(n,minimum,maximum)
 {

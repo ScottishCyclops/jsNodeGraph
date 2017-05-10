@@ -1,16 +1,27 @@
-HEADER_MIN_WIDTH = 90;
-HEADER_HEIGHT = 30;
-BOX_COLOR = '#333';
-TEXT_LIGHT_COLOR = '#ecf0f1';
-TEXT_DARK_COLOR = '#2c3e50';
-SELECT_COLOR = '#d35400';
-RESIZE_COLOR = '#e67e22';
-SELECT_DIST = 5;
-HEADING_PADDING = 12;
-DARK_TEXT_THRESHOLD = 80;
+//constant values for the nodes
+const HEADER_MIN_WIDTH = 90;
+const HEADER_HEIGHT = 30;
+const BOX_COLOR = '#333';
+const TEXT_LIGHT_COLOR = '#ecf0f1';
+const TEXT_DARK_COLOR = '#2c3e50';
+const SELECT_COLOR = '#d35400';
+const RESIZE_COLOR = '#e67e22';
+const SELECT_DIST = 5;
+const HEADING_PADDING = 12;
+const DARK_TEXT_THRESHOLD = 80;
 
 class BaseNode
 {
+    /**
+     * Creates a basic node, holding a position on the canvas, a size, a color and a heading text.
+     * 
+     * @param {number} x the x position on the canvas
+     * @param {number} y the y position on the canvas
+     * @param {number} w the width of the node
+     * @param {number} h the height of the node
+     * @param {*} c the color of the header of the node
+     * @param {string} heading the text contained in the node's header
+     */
     constructor(x,y,w,h,c,heading)
     {
         //style to check final size
@@ -36,6 +47,11 @@ class BaseNode
         this.textColor = brightness(color(this.color)) > DARK_TEXT_THRESHOLD ? TEXT_DARK_COLOR : TEXT_LIGHT_COLOR;
     }
 
+    /**
+     * Template function overloaded by all the child nodes.
+     * 
+     * verifies that all the input values are up to date, and computes the connected nodes if needed.
+     */
     compute()
     {
         //foreach io in this node, we update it's value
@@ -59,13 +75,25 @@ class BaseNode
         console.log("computed " + this.heading);
     }
     
-    connect(inputName,outputNode,outputName)
+    /**
+     * Adds a connection from on of this node's inputs to an other node's output.
+     * 
+     * @param {string} inputName the name of the input we want to connect from
+     * @param {BaseNode} outputNode the node we want to connect to
+     * @param {string} outputName the name of the output we want to connect to
+     */
+   connect(inputName,outputNode,outputName)
     {
         this.ios[inputName].defaultValue = this.ios[inputName].value;
         this.ios[inputName].connection = new Connection(outputNode,outputName);
         this.needsRecompute = true;
     }
 
+    /**
+     * Removes a connection from on of this noe's inputs.
+     * 
+     * @param {string} inputName 
+     */
     disconnect(inputName)
     {
         this.ios[inputName].value = this.ios[inputName].defaultValue;
@@ -73,17 +101,35 @@ class BaseNode
         this.needsRecompute = true;
     }
 
+    /**
+     * Moves this node to a given position.
+     * 
+     * @param {number} x the x componant of the new position
+     * @param {number} y the y componant of the new position
+     */
     moveTo(x,y)
     {
         this.x = clamp(x,0,width-this.w);
         this.y = clamp(y,0,height-this.h);
     }
 
+    /**
+     * Resizes this node's width to a new given one.
+     * 
+     * @param {number} w the new width of the node
+     */
     resizeTo(w)
     {
+        //make sure the new width is bigger than the minimum
+        //and make sure we arn't resizing outside the canvas
         this.w = clamp(w,this.minWidth,width-this.x);
     }
 
+    /**
+     * Draws the node on the canvas.
+     * 
+     * take care of outlines, ios, minimization and connection lines.
+     */
     draw()
     {
         //header
@@ -151,23 +197,22 @@ class BaseNode
         }
     }
 
-    minimize()
-    {
-        this.isMinimized = true;
-    }
+    /**
+     * Simple method setting isMinimized to true.
+     */
+    minimize(){this.isMinimized = true;}
+    /**
+     * Simple method setting isMinimized to false.
+     */
+    maximize(){this.isMinimized = false;}
 
-    maximize()
-    {
-        this.isMinimized = false;
-    }
+    /**
+     * Simple method setting isSelected to true.
+     */
+    select(){this.isSelected = true;}
 
-    select()
-    {
-        this.isSelected = true;
-    }
-
-    deselect()
-    {
-        this.isSelected = false;
-    }
+     /**
+     * Simple method setting isSelected to false.
+     */
+    deselect(){this.isSelected = false;}
 }

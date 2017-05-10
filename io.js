@@ -1,9 +1,15 @@
-IO_RADIUS = 9;
-IO_DISTANCE = 20;
-IO_PADDING = 10;
-IO_LEGEND_COLOR = '#ecf0f1';
-IO_LEGEND_PADDING = 12;
+//constant values for the ios
+const IO_RADIUS = 9;
+const IO_DISTANCE = 20;
+const IO_PADDING = 10;
+const IO_LEGEND_COLOR = '#ecf0f1';
+const IO_LEGEND_PADDING = 12;
 
+/**
+ * Represents the data type of an io. Either COLOR, NUMBER or VECTOR.
+ * 
+ * associates a color property depending of the type.
+ */
 let dataTypes = Object.freeze
 ({
     COLOR  : 0,
@@ -17,6 +23,9 @@ let dataTypes = Object.freeze
     }
 });
 
+/**
+ * Represents an io type. Either IN or OUT.
+ */
 let ioTypes = Object.freeze
 ({
     IN : 0,
@@ -25,6 +34,12 @@ let ioTypes = Object.freeze
 
 class Connection
 {
+    /**
+     * Creates a structure containing a node and an output io representing a connection.
+     * 
+     * @param {BaseNode} node the node to which the connection is made
+     * @param {string} outputName the name of the output io to which the connection is made
+     */
     constructor(node,outputName)
     {
         this.node = node;
@@ -34,6 +49,16 @@ class Connection
 
 class Io
 {
+    /**
+     * Creates an io object, containing an index, a legend and a connection.
+     * 
+     * @param {number} index the index of this io within all of the ios of the node
+     * @param {number} ioType the type of io. Either IN or OUT
+     * @param {number} dataType the data type the io holds. Either COLOR, NUMER or VECTOR
+     * @param {string} legend the text written next to the io
+     * @param {Connection} connection the connection object. can be null if no connection
+     * @param {*} defaultValue the value than gets set at the io creation
+     */
     constructor(index,ioType,dataType,legend,connection,defaultValue)
     {
         this.y = index*IO_DISTANCE;
@@ -45,6 +70,12 @@ class Io
         this.value = defaultValue;
     }
 
+    /**
+     * Draws the io at a given x and y, adding the local y value to the given one.
+     * 
+     * @param {number} x the x position on the canvas
+     * @param {number} y the y position on the canvas
+     */
     draw(x,y)
     {
         //circle

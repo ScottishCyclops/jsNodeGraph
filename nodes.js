@@ -1,5 +1,11 @@
 class MixNode extends BaseNode
 {
+    /**
+     * Mix node lerping between 2 colors based on a factor.
+     * 
+     * @param {number} x x componant of the default location
+     * @param {number} y y componant of the default location
+     */
     constructor(x,y)
     {
         super(x,y,130,120,'#16a085','Mix');
@@ -13,6 +19,11 @@ class MixNode extends BaseNode
 
     }
 
+    /**
+     * Overloaded function doing the actual node calculation after updating the inputs.
+     * 
+     * this function only does the actual calculation if needed.
+     */
     compute()
     {
         //we update our input values
@@ -29,6 +40,12 @@ class MixNode extends BaseNode
 
 class OutNode extends BaseNode
 {
+    /**
+     * Output node responsable for handling the output of the whole graph
+     * 
+     * @param {number} x x componant of the default location
+     * @param {number} y y componant of the default location
+     */
     constructor(x,y)
     {
         super(x,y,130,60,'#7f8c8d','Image Output');
@@ -39,6 +56,9 @@ class OutNode extends BaseNode
         };
     }
 
+    /**
+     * Overloaded function doing the actual node calculation after updating the inputs.
+     */
     compute()
     {
         super.compute();
@@ -48,6 +68,12 @@ class OutNode extends BaseNode
 
 class ColorNode extends BaseNode
 {
+    /**
+     * Node containing a single RGB color value.
+     * 
+     * @param {number} x x componant of the default location
+     * @param {number} y y componant of the default location
+     */
     constructor(x,y)
     {
         super(x,y,130,60,'#f1c40f','RGB Color');
@@ -58,12 +84,19 @@ class ColorNode extends BaseNode
         };
     }
 
+    /**
+     * Overloaded function doing the actual node calculation after updating the inputs.
+     */
     compute()
     {
         super.compute();
         this.needsRecompute = false;
     }
 
+
+    /**
+     * Test method for changing the color of the node by code
+     */
     setColor(c)
     {
         this.ios['oColor'].value = c;
