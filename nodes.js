@@ -58,11 +58,17 @@ class OutNode extends BaseNode
 
     /**
      * Overloaded function doing the actual node calculation after updating the inputs.
+     * 
+     * this function only does the actual calculation if needed.
      */
     compute()
     {
         super.compute();
-        setBackgroundColor(this.ios['iImage'].value);
+        if(this.needsRecompute)
+        {
+            setBackgroundColor(this.ios['iImage'].value);
+            this.needsRecompute = false;
+        }
     }
 }
 
@@ -100,6 +106,6 @@ class ColorNode extends BaseNode
     setColor(c)
     {
         this.ios['oColor'].value = c;
-        this.needsRecompute = true;
+        this.somethingChanged();
     }
 }

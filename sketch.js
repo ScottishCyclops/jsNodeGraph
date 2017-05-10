@@ -7,7 +7,8 @@ let backColor;
 
 function setup()
 {
-    createCanvas(800,600);
+    createCanvas(innerWidth,innerHeight);
+    document.addEventListener('contextmenu', event => event.preventDefault());
 
     nodes = new Array();
 
@@ -20,7 +21,7 @@ function setup()
     nodes[3].connect('iColor2',nodes[2],'oColor');
     nodes[0].connect('iImage',nodes[3],'oColor');
 
-    nodes[1].setColor(color(0,255,0));
+    nodes[1].setColor(color(0,0,0));
     nodes[2].setColor(color(255,0,0));
 
     backColor = 100;
@@ -30,12 +31,25 @@ function draw()
 {
     background(backColor);
 
-    //we always compute the output node
-    nodes[0].compute();
-
+    //nodes[0].compute();
+    //TODO: draw nodes in order of connection to avoid lines on top of ios
     nodes.forEach(function(node){
         node.draw();
     }, this);
+}
+
+function keyPressed()
+{
+    
+    if(keyCode === 112) //F1
+    {
+        nodes[0].compute();
+    }
+    if(keyCode === 13) //ENTER
+    {
+        nodes[1].setColor(color(random(255),random(255),random(255)));
+    }
+    
 }
 
 function mousePressed()

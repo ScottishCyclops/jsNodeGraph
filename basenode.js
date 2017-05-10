@@ -45,6 +45,18 @@ class BaseNode
         this.needsRecompute = true;
 
         this.textColor = brightness(color(this.color)) > DARK_TEXT_THRESHOLD ? TEXT_DARK_COLOR : TEXT_LIGHT_COLOR;
+
+        //array that holds all the nodes our outputs are connected to
+        this.connectedNodes = new Array();
+    }
+
+    somethingChanged()
+    {
+        this.needsRecompute = true;
+        this.connectedNodes.forEach(function(node) {
+            node.needsRecompute = true;
+        }, this);
+        console.log("changed "+this.heading);
     }
 
     /**
@@ -55,23 +67,24 @@ class BaseNode
     compute()
     {
         //foreach io in this node, we update it's value
-        for(let io in this.ios)
+        for(let i in this.ios)
         {
             //if the io is connected to something. otherwise, the value is up to date
-            if(this.ios[io].connection != null)
+            if(this.ios[i].connection != null)
             {
-                //we make sure the node's output are up to date
-                if(this.ios[io].connection.node.needsRecompute)
+                //we make sure the node's output we are connected to are up to date
+                if(this.ios[i].connection.node.needsRecompute)
                 {
-                    this.ios[io].connection.node.compute();
+                    this.ios[i].connection.node.compute();
                     //we take the value from the node's ouput we are connected to
-                    this.ios[io].value = this.ios[io].connection.node.ios[this.ios[io].connection.outputName].value;
+                    this.ios[i].value = this.ios[i].connection.node.ios[this.ios[i].connection.outputName].value;
 
                     //if the parent needs recompute, so do we
                     this.needsRecompute = true;
                 }
             }
         }
+        
         console.log("computed " + this.heading);
     }
     
@@ -84,9 +97,24 @@ class BaseNode
      */
    connect(inputName,outputNode,outputName)
     {
-        this.ios[inputName].defaultValue = this.ios[inputName].value;
-        this.ios[inputName].connection = new Connection(outputNode,outputName);
-        this.needsRecompute = true;
+        if(this.ios[inputName] === undefined || outputNode.ios[outputName] === undefined)
+        {
+            console.log("Unvalid connection made from "+this.heading);
+        }
+        else
+        {
+            this.ios[inputName].defaultValue = this.ios[inputName].value;
+            this.ios[inputName].connection = new Connection(outputNode,outputName);
+
+            this.somethingChanged();
+
+            //we add ouself to the newly connected node's list
+            if(outputNode.connectedNodes.indexOf(this) === -1)
+            {
+                outputNode.connectedNodes.push(this);
+            }
+
+        }
     }
 
     /**
@@ -96,9 +124,19 @@ class BaseNode
      */
     disconnect(inputName)
     {
+        if(this.ios[inputName].connection !== null)
+        {
+            let connectedNodeIndex = this.ios[inputName].connection.node.connectedNodes.indexOf(this);
+            if(connectedNodeIndex !== -1)
+            {
+                this.ios[inputName].connection.node.connectedNodes.splice(connectedNodeIndex,1);
+                this.ios[inputName].connection = null;
+            }
+        }
+
         this.ios[inputName].value = this.ios[inputName].defaultValue;
-        this.ios[inputName].connection = null;
-        this.needsRecompute = true;
+
+        this.somethingChanged();
     }
 
     /**
