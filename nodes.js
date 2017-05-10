@@ -109,3 +109,41 @@ class ColorNode extends BaseNode
         this.somethingChanged();
     }
 }
+
+class RandomNode extends BaseNode
+{
+    /**
+     * Node containing a random value between 0 and 1
+     * 
+     * @param {number} x x componant of the default location
+     * @param {number} y y componant of the default location
+     */
+    constructor(x,y)
+    {
+        super(x,y,130,60,'#8e44ad','Random');
+
+        this.ios =
+        {
+            'oNumber' : new Io(0, ioTypes.OUT, dataTypes.NUMBER, 'Number', null, random()),
+        };
+    }
+
+    /**
+     * Overloaded function doing the actual node calculation after updating the inputs.
+     */
+    compute()
+    {
+        super.compute();
+        this.needsRecompute = false;
+    }
+
+
+    /**
+     * Test method for changing the color of the node by code
+     */
+    reset()
+    {
+        this.ios['oNumber'].value = random();
+        this.somethingChanged();
+    }
+}
