@@ -50,13 +50,19 @@ class BaseNode
         this.connectedNodes = new Array();
     }
 
+    /**
+     * Tells the node that it will need to be recomputed.
+     * 
+     * in that case, we also need to recompute all the connected nodes down the chain
+     */
     somethingChanged()
     {
+        console.log(this.heading+" just changed");
+        
         this.needsRecompute = true;
         this.connectedNodes.forEach(function(node) {
-            node.needsRecompute = true;
+            node.somethingChanged();
         }, this);
-        console.log("changed "+this.heading);
     }
 
     /**
