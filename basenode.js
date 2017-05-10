@@ -58,11 +58,13 @@ class BaseNode
     somethingChanged()
     {
         console.log(this.heading+" just changed");
-        
+
         this.needsRecompute = true;
         this.connectedNodes.forEach(function(node) {
             node.somethingChanged();
         }, this);
+
+        graphNeedsRecompute = true;
     }
 
     /**

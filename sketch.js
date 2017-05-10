@@ -5,6 +5,8 @@ let nodes;
 //test variable containing the current background color
 let backColor;
 
+let graphNeedsRecompute;
+
 function setup()
 {
     createCanvas(innerWidth,innerHeight);
@@ -16,22 +18,31 @@ function setup()
     nodes.push(new ColorNode(10,height/2));
     nodes.push(new ColorNode(10,height/2+100));
     nodes.push(new MixNode(210,height/2));
+    nodes.push(new RandomNode(10,height/2-100));
 
     nodes[3].connect('iColor1',nodes[1],'oColor');
     nodes[3].connect('iColor2',nodes[2],'oColor');
     nodes[0].connect('iImage',nodes[3],'oColor');
+    nodes[3].connect('iMix',nodes[4],'oNumber');
 
     nodes[1].setColor(color(0,0,0));
     nodes[2].setColor(color(255,0,0));
 
     backColor = 100;
+
+    graphNeedsRecompute = true;
 }
 
 function draw()
 {
     background(backColor);
 
-    //nodes[0].compute();
+    if(graphNeedsRecompute)
+    {
+        nodes[0].compute();
+        graphNeedsRecompute = false;
+    }
+
     //TODO: draw nodes in order of connection to avoid lines on top of ios
     nodes.forEach(function(node){
         node.draw();
