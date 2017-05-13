@@ -62,9 +62,8 @@ class BaseNode
         this.needsRecompute = true;
         this.connectedNodes.forEach(function(node) {
             node.somethingChanged();
+            globalNeedRecompute = true;
         }, this);
-
-        graphNeedsRecompute = true;
     }
 
     /**
@@ -185,9 +184,7 @@ class BaseNode
         //heading
         textStyle(BOLD);
         textSize(13);
-
         fill(this.textColor);
-
         textAlign(CENTER,CENTER);
         text(this.heading,this.x+this.w/2,this.y+HEADER_HEIGHT/2);
 
